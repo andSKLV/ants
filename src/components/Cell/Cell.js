@@ -10,6 +10,8 @@ const getColor = type => {
       return "yellow";
     case "wall":
       return "black";
+    case "empty":
+      return "white";
     default:
       return "white";
   }

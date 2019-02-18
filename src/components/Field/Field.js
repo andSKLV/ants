@@ -1,6 +1,35 @@
 import React from "react";
+import Cell from "../Cell";
 
 const Field = props => {
-  return <div className="Field">Field</div>;
+  const { fieldArray, onClickSet } = props;
+  const getType = str => {
+    const obj = {
+      x: "empty",
+      e: "enemy",
+      h: "honey",
+      f: "friend",
+      w: "wall"
+    };
+    return obj[str];
+  };
+  const createField = arr => {
+    return arr.map((row, ri) => {
+      return (
+        <div className="Row" key={ri}>
+          {row.map((cell, ci) => {
+            return (
+              <Cell
+                type={getType(cell)}
+                onClick={() => onClickSet(ri, ci)}
+                key={`${ri}-${ci}`}
+              />
+            );
+          })}
+        </div>
+      );
+    });
+  };
+  return <div className="Field">{createField(fieldArray)}</div>;
 };
 export default Field;

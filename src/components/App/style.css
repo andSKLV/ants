@@ -7,15 +7,26 @@
   margin-top: 15%;
   border: 1px solid black;
   min-width: 80%;
+  padding: 4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 .Field {
   margin-top: 32px;
   border: 1px solid black;
   min-width: 80%;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.Row{
+  display: flex;
+  flex-direction: row;
 }
 .Cell {
-  width: 10px;
-  height: 10px;
+  width: 16px;
+  height: 16px;
   margin: 0px;
   padding: 0px;
   border: 1px solid black;
