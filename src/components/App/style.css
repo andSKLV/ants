@@ -1,0 +1,23 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ControlBar {
+  margin-top: 15%;
+  border: 1px solid black;
+  min-width: 80%;
+}
+.Field {
+  margin-top: 32px;
+  border: 1px solid black;
+  min-width: 80%;
+}
+.Cell {
+  width: 10px;
+  height: 10px;
+  margin: 0px;
+  padding: 0px;
+  border: 1px solid black;
+  box-sizing: content-box;
+}
