@@ -50,6 +50,7 @@ class App extends React.Component {
         <ControlBar
           onClickSetter={this.onClickSetter}
           onClickStart={this.onClickStart}
+          isStarted={this.state.isStarted}
         />
         <Field
           fieldArray={this.state.fieldArray}
