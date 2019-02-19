@@ -1,5 +1,4 @@
 import React from "react";
-import Cell from "../Cell";
 import Tag from "./Tag.js";
 
 const ControlBar = props => {

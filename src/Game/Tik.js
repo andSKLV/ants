@@ -1,4 +1,2 @@
-class Tik {
-  constructor() {}
-}
+class Tik {}
 export default Tik;

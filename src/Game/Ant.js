@@ -1,9 +1,9 @@
 import Cell from "./Cell.js";
 
 class Ant extends Cell {
-  constructor(x, y, type) {
-    super(x, y, type);
-  }
+  // constructor(x, y, type) {
+  //   super(x, y, type);
+  // }
   /**
    *
    * @param {Array} visibleArr массив видимых клеток для муравья
@@ -11,7 +11,6 @@ class Ant extends Cell {
   makeMove(visibleArr) {
     const moves = ["-x", "+x", "-y", "+y"];
     const d = Math.floor(Math.random() * (4 - 0));
-    console.log(moves[d]);
     return moves[d]; // возвращает значение направления движения
   }
   updateXY(x, y) {

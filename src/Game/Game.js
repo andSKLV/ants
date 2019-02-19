@@ -2,7 +2,7 @@ import Tik from "./Tik.js";
 import Ant from "./Ant.js";
 import CONFIG from "../CONFIG.js";
 import Cell from "./Cell.js";
-import { GetRandom } from "./service.js";
+import { GetRandom, GetCell } from "./service.js";
 
 class Game {
   constructor(fn) {
@@ -11,6 +11,7 @@ class Game {
     this.field = [];
     this.createField();
     this.tikNum = 0;
+    this.antsToDelete = [];
     this.setFieldView = fn;
   }
   createField() {
@@ -44,8 +45,11 @@ class Game {
     this.ants.push(ant);
     return ant;
   }
-  getCell(x, y) {
-    return this.field[y][x];
+  deleteAnt(ant) {
+    const { x, y } = ant;
+    this.removeCell(x, y);
+    this.antsToDelete.push(ant);
+    return ant;
   }
   removeCell(x, y) {
     const cell = new Cell(x, y, "empty");
@@ -56,7 +60,7 @@ class Game {
     this.field[y][x] = cell;
     return this.field;
   }
-  moveCell(ant, direction) {
+  moveCell(ant, direction, tikField) {
     const { x, y } = ant;
     let newX, newY;
     switch (direction) {
@@ -76,9 +80,10 @@ class Game {
         newX = x;
         newY = y + 1;
         break;
+      default:
+        return false;
     }
     const targetCell = this.field[newY][newX];
-    debugger;
     switch (targetCell.type) {
       case "empty":
         this.moveAnt(ant, newX, newY);
@@ -88,11 +93,12 @@ class Game {
         break;
       case "enemy":
       case "friend":
-        this.destroyAnts(ant, newX, newY);
+        // this.destroyAnts(ant, newX, newY);
         break;
       default:
         break;
     }
+    return ant;
   }
   moveAnt = (ant, newX, newY) => {
     const { x, y } = ant;
@@ -107,8 +113,15 @@ class Game {
     this.createAnt(randX, randY, ant.type);
     return true;
   };
-  destroyAnts = (ant, newX, newY) => {
-    //TODO:
+  destroyAnts = (ant1, newX, newY) => {
+    const ant2 = this.field[newY][newX];
+    this.deleteAnt(ant);
+    this.deleteAnt(ant2);
+    return false;
+  };
+  updateAntsArray = () => {
+    this.ants = this.ants.filter(ant => !this.antsToDelete.includes(ant));
+    this.antsToDelete = [];
   };
   getRandomEmptyCell = () => {
     let isFound = false;
@@ -142,8 +155,9 @@ class Game {
     });
     moves.forEach(move => {
       this.moveCell(move.ant, move.direction);
+      if (this.antsToDelete.length) this.updateAntsArray();
     });
-    fn(this.field);
+    fn(this.field); //setState new field
     this.tikNum++;
     if (this.tikNum > CONFIG.maxMoves) this.stop();
   };
