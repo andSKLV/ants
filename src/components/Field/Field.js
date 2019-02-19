@@ -3,16 +3,6 @@ import Cell from "../Cell";
 
 const Field = props => {
   const { fieldArray, onClickSet } = props;
-  const getType = str => {
-    const obj = {
-      x: "empty",
-      e: "enemy",
-      h: "honey",
-      f: "friend",
-      w: "wall"
-    };
-    return obj[str];
-  };
   const createField = arr => {
     return arr.map((row, ri) => {
       return (
@@ -20,7 +10,7 @@ const Field = props => {
           {row.map((cell, ci) => {
             return (
               <Cell
-                type={getType(cell)}
+                type={cell.type}
                 onClick={() => onClickSet(ri, ci)}
                 key={`${ri}-${ci}`}
               />

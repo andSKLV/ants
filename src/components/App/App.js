@@ -2,23 +2,19 @@ import React from "react";
 import "./style.css";
 import ControlBar from "../ControlBar";
 import Field from "../Field";
-import CONFIG from "../CONFIG.js";
+import CONFIG from "../../CONFIG.js";
+import Game from "../../Game";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const field = [];
-    for (let i = 0; i < CONFIG.colNum; i++) {
-      const row = [];
-      for (let j = 0; j < CONFIG.rowNum; j++) {
-        row.push("x");
-      }
-      field.push(row);
-    }
+    this.game = new Game();
+    const field = this.game.field;
     this.state = {
       setter: null,
       isStarted: false,
-      fieldArray: field
+      fieldArray: field,
+      game: null
     };
   }
   onClickSetter = type => {
@@ -41,8 +37,9 @@ class App extends React.Component {
     if (!this.state.setter) return false;
     if (this.state.isStarted) return false;
     const newFieldArray = this.state.fieldArray;
-    newFieldArray[x][y] = this.getShortCut(this.state.setter);
-    this.setState({ fieldArray: newFieldArray });
+    const cell = this.game.createCell(x, y, this.state.setter);
+    const newField = this.game.switchCell(x, y, cell);
+    this.setState({ fieldArray: newField });
   };
   render() {
     return (

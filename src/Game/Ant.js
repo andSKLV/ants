@@ -1,8 +1,8 @@
-class Ant {
+import Cell from "./Cell.js";
+
+class Ant extends Cell {
   constructor(x, y, type) {
-    this.x = x;
-    this.y = y;
-    this.type = type;
+    super(x, y, type);
   }
   /**
    *
