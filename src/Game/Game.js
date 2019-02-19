@@ -14,14 +14,14 @@ class Game {
   }
   createField() {
     const field = [];
-    for (let i = 0; i < CONFIG.colNum; i++) {
+    for (let i = 0; i < CONFIG.rowNum; i++) {
       const row = [];
-      for (let j = 0; j < CONFIG.rowNum; j++) {
+      for (let j = 0; j < CONFIG.colNum; j++) {
         const type =
           j === 0 ||
           i === 0 ||
-          i === CONFIG.colNum - 1 ||
-          j === CONFIG.rowNum - 1
+          j === CONFIG.colNum - 1 ||
+          i === CONFIG.rowNum - 1
             ? "wall"
             : "empty";
         const cell = new Cell(j, i, type);
