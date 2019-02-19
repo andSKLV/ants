@@ -32,3 +32,6 @@
   border: 1px solid black;
   box-sizing: content-box;
 }
+.activeTag {
+  border: 1px solid red;
+}

@@ -56,6 +56,7 @@ class App extends React.Component {
           onClickStart={this.onClickStart}
           onClickStop={this.onClickStop}
           isStarted={this.state.isStarted}
+          setter={this.state.setter}
         />
         <Field
           fieldArray={this.state.fieldArray}

@@ -1,18 +1,15 @@
 import React from "react";
 import Cell from "../Cell";
+import Tag from "./Tag.js";
 
 const ControlBar = props => {
-  const { onClickSetter, onClickStart, onClickStop, isStarted } = props;
+  const { onClickSetter, onClickStart, onClickStop, isStarted, setter } = props;
   return (
     <div className="ControlBar">
-      <Cell type="friend" onClick={type => onClickSetter(type)} />
-      <div>Friend</div>
-      <Cell type="enemy" onClick={type => onClickSetter(type)} />
-      <div>Enemy</div>
-      <Cell type="honey" onClick={type => onClickSetter(type)} />
-      <div>Honey</div>
-      <Cell type="wall" onClick={type => onClickSetter(type)} />
-      <div>Wall</div>
+      <Tag title="friend" onClickSetter={onClickSetter} setter={setter} />
+      <Tag title="enemy" onClickSetter={onClickSetter} setter={setter} />
+      <Tag title="honey" onClickSetter={onClickSetter} setter={setter} />
+      <Tag title="wall" onClickSetter={onClickSetter} setter={setter} />
       <button
         className="start-btn"
         onClick={() => (isStarted ? onClickStop() : onClickStart())}
