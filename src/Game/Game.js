@@ -60,7 +60,7 @@ class Game {
     this.field[y][x] = cell;
     return this.field;
   }
-  moveCell(ant, direction, tikField) {
+  moveCell(ant, direction) {
     const { x, y } = ant;
     let newX, newY;
     switch (direction) {
@@ -91,10 +91,10 @@ class Game {
       case "honey":
         this.eatHoney(ant, newX, newY);
         break;
-      case "enemy":
       case "friend":
-        // this.destroyAnts(ant, newX, newY);
-        break;
+      case "enemy":
+        const ant2 = this.field[newY][newX];
+        if (ant2.type !== ant.type) this.destroyAnts(ant, ant2);
       default:
         break;
     }
@@ -113,11 +113,32 @@ class Game {
     this.createAnt(randX, randY, ant.type);
     return true;
   };
-  destroyAnts = (ant1, newX, newY) => {
-    const ant2 = this.field[newY][newX];
-    this.deleteAnt(ant);
+  destroyAnts = (ant1, ant2) => {
+    this.deleteAnt(ant1);
     this.deleteAnt(ant2);
     return false;
+  };
+  checkNeighbour = () => {
+    const f = this.field;
+    this.ants.forEach(ant => {
+      if (this.antsToDelete.includes(ant)) return false;
+      const neighArr = getNeighbourArray(ant);
+      const searchType = ant.type === "enemy" ? "friend" : "enemy";
+      neighArr.forEach(neigh => {
+        if (
+          neigh &&
+          neigh.type === searchType &&
+          !this.antsToDelete.includes(neigh)
+        ) {
+          this.destroyAnts(ant, neigh);
+          return false;
+        }
+      });
+    });
+    function getNeighbourArray(ant) {
+      const { x, y } = ant;
+      return [f[y - 1][x], f[y + 1][x], f[y][x - 1], f[y][x + 1]];
+    }
   };
   updateAntsArray = () => {
     this.ants = this.ants.filter(ant => !this.antsToDelete.includes(ant));
@@ -149,6 +170,14 @@ class Game {
     return [];
   };
   makeTik = fn => {
+    console.time();
+    console.log(this.ants.length);
+    this.checkNeighbour();
+    if (this.antsToDelete.length) this.updateAntsArray();
+    const FIELD_LENGTH = this.field
+      .flat()
+      .filter(x => x.type === "enemy" || x.type === "friend").length;
+    if (this.ants.length !== FIELD_LENGTH) debugger; // где то ошибка в вычитаниях муравьев
     const moves = this.ants.map(ant => {
       const direction = ant.makeMove();
       return { ant, direction };
@@ -160,6 +189,7 @@ class Game {
     fn(this.field); //setState new field
     this.tikNum++;
     if (this.tikNum > CONFIG.maxMoves) this.stop();
+    console.timeEnd();
   };
   stop = () => {
     clearInterval(this.timerId);
