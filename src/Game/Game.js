@@ -2,6 +2,7 @@ import Tik from "./Tik.js";
 import Ant from "./Ant.js";
 import CONFIG from "../CONFIG.js";
 import Cell from "./Cell.js";
+import { GetRandom } from "./service.js";
 
 class Game {
   constructor(fn) {
@@ -14,17 +15,17 @@ class Game {
   }
   createField() {
     const field = [];
-    for (let i = 0; i < CONFIG.rowNum; i++) {
+    for (let y = 0; y < CONFIG.maxRow; y++) {
       const row = [];
-      for (let j = 0; j < CONFIG.colNum; j++) {
+      for (let x = 0; x < CONFIG.maxCol; x++) {
         const type =
-          j === 0 ||
-          i === 0 ||
-          j === CONFIG.colNum - 1 ||
-          i === CONFIG.rowNum - 1
+          x === 0 ||
+          y === 0 ||
+          x === CONFIG.maxCol - 1 ||
+          y === CONFIG.maxRow - 1
             ? "wall"
             : "empty";
-        const cell = new Cell(j, i, type);
+        const cell = new Cell(x, y, type);
         row.push(cell);
       }
       field.push(row);
@@ -33,22 +34,26 @@ class Game {
   }
   createCell(x, y, type) {
     if (type === "enemy" || type === "friend") {
-      const ant = new Ant(x, y, type);
-      this.ants.push(ant);
+      const ant = this.createAnt(x, y, type);
       return ant;
     }
     return new Cell(x, y, type);
   }
+  createAnt(x, y, type) {
+    const ant = new Ant(x, y, type);
+    this.ants.push(ant);
+    return ant;
+  }
   getCell(x, y) {
-    return this.field[x][y];
+    return this.field[y][x];
   }
   removeCell(x, y) {
     const cell = new Cell(x, y, "empty");
-    this.field[x][y] = cell;
+    this.field[y][x] = cell;
     return this.field;
   }
   setCell(x, y, cell) {
-    this.field[x][y] = cell;
+    this.field[y][x] = cell;
     return this.field;
   }
   moveCell(ant, direction) {
@@ -72,14 +77,49 @@ class Game {
         newY = y + 1;
         break;
     }
-    const targetCell = this.field[newX][newY];
+    const targetCell = this.field[newY][newX];
     debugger;
-    if (targetCell.type === "empty") {
-      this.field[newX][newY] = ant;
-      ant.updateXY(newX, newY);
-      this.field[x][y] = this.createCell(x, y, "empty");
+    switch (targetCell.type) {
+      case "empty":
+        this.moveAnt(ant, newX, newY);
+        break;
+      case "honey":
+        this.eatHoney(ant, newX, newY);
+        break;
+      case "enemy":
+      case "friend":
+        this.destroyAnts(ant, newX, newY);
+        break;
+      default:
+        break;
     }
   }
+  moveAnt = (ant, newX, newY) => {
+    const { x, y } = ant;
+    this.field[newY][newX] = ant;
+    ant.updateXY(newX, newY);
+    this.field[y][x] = this.createCell(x, y, "empty");
+    return true;
+  };
+  eatHoney = (ant, newX, newY) => {
+    this.moveAnt(ant, newX, newY);
+    const { x: randX, y: randY } = this.getRandomEmptyCell();
+    this.createAnt(randX, randY, ant.type);
+    return true;
+  };
+  destroyAnts = (ant, newX, newY) => {
+    //TODO:
+  };
+  getRandomEmptyCell = () => {
+    let isFound = false;
+    let x, y;
+    while (!isFound) {
+      x = GetRandom(0, CONFIG.maxCol);
+      y = GetRandom(0, CONFIG.maxRow);
+      if (this.field[y][x].type === "empty") isFound = true;
+    }
+    return { x, y };
+  };
   /**
    * @param {Array} field - двумерный массив поля
    */
@@ -103,7 +143,6 @@ class Game {
     moves.forEach(move => {
       this.moveCell(move.ant, move.direction);
     });
-    debugger;
     fn(this.field);
     this.tikNum++;
     if (this.tikNum > CONFIG.maxMoves) this.stop();

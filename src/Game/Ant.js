@@ -11,6 +11,7 @@ class Ant extends Cell {
   makeMove(visibleArr) {
     const moves = ["-x", "+x", "-y", "+y"];
     const d = Math.floor(Math.random() * (4 - 0));
+    console.log(moves[d]);
     return moves[d]; // возвращает значение направления движения
   }
   updateXY(x, y) {

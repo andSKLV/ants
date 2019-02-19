@@ -11,8 +11,8 @@ const Field = props => {
             return (
               <Cell
                 type={cell.type}
-                onClick={() => onClickSet(ri, ci)}
-                key={`${ri}-${ci}`}
+                onClick={() => onClickSet(ci, ri)}
+                key={`${ci}-${ri}`}
               />
             );
           })}

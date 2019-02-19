@@ -1,6 +1,6 @@
 const CONFIG = {
-  rowNum: 10,
-  colNum: 50,
+  maxRow: 10,
+  maxCol: 30,
   maxMoves: 50,
   tikTime: 500
 };
