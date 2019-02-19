@@ -10,6 +10,7 @@ class Game {
     this.timerId = null;
     this.field = [];
     this.createField();
+    this.createRandomAnts(35);
     this.tikNum = 0;
     this.antsToDelete = [];
     this.setFieldView = fn;
@@ -33,6 +34,16 @@ class Game {
     }
     this.field = field;
   }
+  createRandomAnts(num) {
+    for (let n = 0; n <= num; n++) {
+      const { x, y } = this.getRandomEmptyCell();
+      this.createAnt(x, y, "enemy");
+    }
+    for (let n = 0; n <= num; n++) {
+      const { x, y } = this.getRandomEmptyCell();
+      this.createAnt(x, y, "friend");
+    }
+  }
   createCell(x, y, type) {
     if (type === "enemy" || type === "friend") {
       const ant = this.createAnt(x, y, type);
@@ -43,6 +54,7 @@ class Game {
   createAnt(x, y, type) {
     const ant = new Ant(x, y, type);
     this.ants.push(ant);
+    this.field[y][x] = ant;
     return ant;
   }
   deleteAnt(ant) {
@@ -162,17 +174,12 @@ class Game {
       () => this.makeTik(fnUpdateField),
       CONFIG.tikTime
     );
-    //ставим таймер
-    //по таймеру выполняем makeTik
-    //на каждом тике проходимся по массиву муравьев и запрашиваем makeMove
-    // собрав все движения муравьев выполняем рассчет коллизий и собираем новое поле
-    // в конце каждого тика нужно отдавать массив поля на отрисовку
-    return [];
   };
   makeTik = fn => {
     console.time();
     console.log(this.ants.length);
     this.checkNeighbour();
+    console.log("to delete ", this.antsToDelete.length);
     if (this.antsToDelete.length) this.updateAntsArray();
     const FIELD_LENGTH = this.field
       .flat()
