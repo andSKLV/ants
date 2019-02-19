@@ -22,6 +22,14 @@ class App extends React.Component {
   };
   onClickStart = () => {
     this.setState({ isStarted: !this.state.isStarted, setter: false });
+    this.game.start(this.updateField);
+  };
+  onClickStop = () => {
+    this.setState({ isStarted: !this.state.isStarted, setter: false });
+    this.game.stop();
+  };
+  updateField = newField => {
+    this.setState({ field: newField });
   };
   getShortCut = str => {
     const obj = {
@@ -36,9 +44,8 @@ class App extends React.Component {
   onClickSet = (x, y) => {
     if (!this.state.setter) return false;
     if (this.state.isStarted) return false;
-    const newFieldArray = this.state.fieldArray;
     const cell = this.game.createCell(x, y, this.state.setter);
-    const newField = this.game.switchCell(x, y, cell);
+    const newField = this.game.setCell(x, y, cell);
     this.setState({ fieldArray: newField });
   };
   render() {
@@ -47,6 +54,7 @@ class App extends React.Component {
         <ControlBar
           onClickSetter={this.onClickSetter}
           onClickStart={this.onClickStart}
+          onClickStop={this.onClickStop}
           isStarted={this.state.isStarted}
         />
         <Field

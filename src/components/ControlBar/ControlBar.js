@@ -2,7 +2,7 @@ import React from "react";
 import Cell from "../Cell";
 
 const ControlBar = props => {
-  const { onClickSetter, onClickStart, isStarted } = props;
+  const { onClickSetter, onClickStart, onClickStop, isStarted } = props;
   return (
     <div className="ControlBar">
       <Cell type="friend" onClick={type => onClickSetter(type)} />
@@ -13,7 +13,10 @@ const ControlBar = props => {
       <div>Honey</div>
       <Cell type="wall" onClick={type => onClickSetter(type)} />
       <div>Wall</div>
-      <button className="start-btn" onClick={() => onClickStart()}>
+      <button
+        className="start-btn"
+        onClick={() => (isStarted ? onClickStop() : onClickStart())}
+      >
         {isStarted ? "Stop" : "Start"}
       </button>
     </div>
