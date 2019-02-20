@@ -8,7 +8,10 @@ import Game from "../../Game";
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.game = new Game();
+    this.game = new Game({
+      fnStop: this.applyStopper,
+      fnUpdateField: this.updateField
+    });
     const field = this.game.field;
     this.state = {
       setter: null,
@@ -25,8 +28,10 @@ class App extends React.Component {
     this.game.start(this.updateField);
   };
   onClickStop = () => {
-    this.setState({ isStarted: !this.state.isStarted, setter: false });
     this.game.stop();
+  };
+  applyStopper = () => {
+    this.setState({ isStarted: !this.state.isStarted, setter: false });
   };
   updateField = newField => {
     this.setState({ field: newField });

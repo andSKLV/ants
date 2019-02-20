@@ -6,7 +6,7 @@ import { GetRandom, GetCell } from "./service.js";
 import { equal } from "assert";
 
 class Game {
-  constructor(fn) {
+  constructor({ fnStop, fnUpdateField }) {
     this.ants = [];
     this.timerId = null;
     this.field = [];
@@ -14,7 +14,8 @@ class Game {
     this.createRandomAnts(45);
     this.tikNum = 0;
     this.antsToDelete = [];
-    this.setFieldView = fn;
+    this.fnStop = fnStop;
+    this.fnUpdateField = fnUpdateField;
   }
   createField() {
     const field = [];
@@ -171,13 +172,10 @@ class Game {
   /**
    * @param {Array} field - двумерный массив поля
    */
-  start = fnUpdateField => {
-    this.timerId = setInterval(
-      () => this.makeTik(fnUpdateField),
-      CONFIG.tikTime
-    );
+  start = () => {
+    this.timerId = setInterval(() => this.makeTik(), CONFIG.tikTime);
   };
-  makeTik = fn => {
+  makeTik = () => {
     console.time();
     this.clg("ants");
     this.checkNeighbour();
@@ -203,13 +201,14 @@ class Game {
       }
     });
 
-    fn(this.field); //setState new field
+    this.fnUpdateField(this.field); //setState new field
     this.tikNum++;
     if (this.tikNum > CONFIG.maxMoves) this.stop();
     console.timeEnd();
   };
   stop = () => {
     clearInterval(this.timerId);
+    this.fnStop();
     this.tikNum = 0;
     this.clg("equal");
   };
