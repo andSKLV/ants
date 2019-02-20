@@ -159,6 +159,10 @@ class Game {
     this.ants = this.ants.filter(ant => !this.antsToDelete.includes(ant));
     this.antsToDelete = [];
   };
+  /**
+   * Получаем рандомную пустую ячейку поля
+   * @returns {object} {x,y} координаты
+   */
   getRandomEmptyCell = () => {
     let isFound = false;
     let x, y;
@@ -168,6 +172,15 @@ class Game {
       if (this.field[y][x].type === "empty") isFound = true;
     }
     return { x, y };
+  };
+  /**
+   * Создание на поле случайной ячейки меда
+   */
+  randomHoney = () => {
+    const { x, y } = this.getRandomEmptyCell();
+    const honeyCell = this.createCell(x, y, "honey");
+    this.setCell(x, y, honeyCell);
+    return honeyCell;
   };
   /**
    * @param {Array} field - двумерный массив поля
@@ -182,11 +195,23 @@ class Game {
     this.clg("del");
     if (this.antsToDelete.length) this.updateAntsArray();
     this.clg("ants");
+
     const FIELD_LENGTH = this.field
       .flat()
-      .filter(x => x.type === "enemy" || x.type === "friend").length;
+      .filter(x => x.type === "enemy" || x.type === "friend").length; // TODO: потом далить
     if (this.ants.length !== FIELD_LENGTH) debugger; // где то ошибка в вычитаниях муравьев
 
+    //движения муравьев
+    this.makeMove();
+    if (this.tikNum % 5 === 0) this.randomHoney();
+    // конец движения
+
+    this.fnUpdateField(this.field); //setState new field
+    this.tikNum++;
+    if (this.tikNum > CONFIG.maxMoves) this.stop();
+    console.timeEnd();
+  };
+  makeMove = () => {
     const moves = this.ants.map(ant => {
       const direction = ant.makeMove();
       return { ant, direction };
@@ -200,11 +225,6 @@ class Game {
         this.clg("ants");
       }
     });
-
-    this.fnUpdateField(this.field); //setState new field
-    this.tikNum++;
-    if (this.tikNum > CONFIG.maxMoves) this.stop();
-    console.timeEnd();
   };
   stop = () => {
     clearInterval(this.timerId);
@@ -215,7 +235,7 @@ class Game {
   checkEquality() {
     const enemy = [];
     const friend = [];
-    this.field.flat().forEach(el => {
+    this.ants.forEach(el => {
       if (el.type === "enemy") enemy.push(el);
       if (el.type === "friend") friend.push(el);
     });
