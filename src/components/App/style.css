@@ -42,6 +42,13 @@
   flex-direction: row;
   justify-content: center;
 }
-.Score div {
-  margin-left: 8px;
+.Friends{
+  background-color: blue;
+  color: white;
+  text-align: center;
+}
+.Enemies{
+  background-color: red;
+  color: white;
+  text-align: center;
 }

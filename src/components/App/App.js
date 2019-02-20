@@ -8,23 +8,34 @@ import Game from "../../Game";
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      setter: null,
+      isStarted: false,
+      fieldArray: [],
+      game: null,
+      friendsPer: "50%",
+      enemiesPer: "50%",
+      friends: CONFIG.initAntsNum,
+      enemies: CONFIG.initAntsNum
+    };
+  }
+  componentDidMount() {
     this.game = new Game({
       fnStop: this.applyStopper,
       fnUpdateField: this.updateField,
       fnUpdateScore: this.applyScore
     });
-    const field = this.game.field;
-    this.state = {
-      setter: null,
-      isStarted: false,
-      fieldArray: field,
-      game: null,
-      friends: null,
-      enemies: null
-    };
+    const fieldArray = this.game.field;
+    this.setState({ fieldArray });
   }
   applyScore = ({ friends, enemies }) => {
-    this.setState({ friends, enemies });
+    const all = friends + enemies;
+    let friendsPer, enemiesPer;
+    friendsPer = (100 * friends) / all;
+    friendsPer = `${friendsPer}%`;
+    enemiesPer = (100 * enemies) / all;
+    enemiesPer = `${enemiesPer}%`;
+    this.setState({ friends, enemies, friendsPer, enemiesPer });
   };
   onClickSetter = type => {
     this.setState({ setter: type });
@@ -70,10 +81,12 @@ class App extends React.Component {
           setter={this.state.setter}
         />
         <div className="Score">
-          <div>Friends:</div>
-          <div>{this.state.friends}</div>
-          <div>Enemies:</div>
-          <div>{this.state.enemies}</div>
+          <div className="Friends" style={{ width: this.state.friendsPer }}>
+            {this.state.friends}
+          </div>
+          <div className="Enemies" style={{ width: this.state.enemiesPer }}>
+            {this.state.enemies}
+          </div>
         </div>
         <Field
           fieldArray={this.state.fieldArray}

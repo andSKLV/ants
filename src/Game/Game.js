@@ -1,9 +1,7 @@
-import Tik from "./Tik.js";
 import Ant from "./Ant.js";
 import CONFIG from "../CONFIG.js";
 import Cell from "./Cell.js";
-import { GetRandom, GetCell } from "./service.js";
-import { equal } from "assert";
+import { GetRandom } from "./service.js";
 
 class Game {
   constructor({ fnStop, fnUpdateField, fnUpdateScore }) {
@@ -13,13 +11,12 @@ class Game {
     this.timerId = null;
     this.field = [];
     this.createField();
-    this.createRandomAnts(20);
+    this.createRandomAnts(CONFIG.initAntsNum);
     this.tikNum = 0;
     this.antsToDelete = [];
     this.fnStop = fnStop;
     this.fnUpdateField = fnUpdateField;
     this.fnUpdateScore = fnUpdateScore;
-    fnUpdateScore(this.getScore());
   }
   createField() {
     const field = [];
@@ -113,6 +110,7 @@ class Game {
       case "enemy":
         const ant2 = this.field[newY][newX];
         if (ant2.type !== ant.type) this.destroyAnts(ant, ant2);
+        break;
       default:
         break;
     }
@@ -198,6 +196,7 @@ class Game {
   makeTik = () => {
     console.time();
     this.clg("ants");
+    //проверка на начальное условие уничтожения муравьев
     this.checkNeighbour();
     this.clg("del");
     if (this.antsToDelete.length) this.updateAntsArray();
@@ -213,9 +212,11 @@ class Game {
     if (this.tikNum % CONFIG.honeyFriquency === 0) this.randomHoney();
     // конец движения
 
+    //update UI
     this.fnUpdateField(this.field); //setState new field
     const score = this.getScore();
     this.fnUpdateScore(score);
+    //
 
     this.tikNum++;
     if (this.isGameOver(score)) this.stop();
@@ -240,6 +241,10 @@ class Game {
       }
     });
   };
+  /**
+   * @param {object} score - кол-во игроков в каждой команде
+   * @returns {boolean} завершена ли игра
+   */
   isGameOver = score => {
     if (this.tikNum > CONFIG.maxMoves) return true;
     if (score.friends === 0 || score.enemies === 0) return true;

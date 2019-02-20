@@ -1,8 +1,9 @@
 const CONFIG = {
-  maxRow: 20,
-  maxCol: 20,
-  maxMoves: 300,
-  tikTime: 50,
-  honeyFriquency: 10
+  maxRow: 30, //высота
+  maxCol: 50, //ширина
+  maxMoves: 300, //ограничение количества тиков
+  tikTime: 50, //задержка между тиками
+  honeyFriquency: 1, //на каждый i-тый тик создается мед
+  initAntsNum: 70 //начальное количество муравьев в каждой команде
 };
 export default CONFIG;
