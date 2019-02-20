@@ -35,3 +35,13 @@
 .activeTag {
   border: 1px solid red;
 }
+.Score{
+  margin-top: 8px;
+  min-width: 80%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.Score div {
+  margin-left: 8px;
+}

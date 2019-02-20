@@ -10,16 +10,22 @@ class App extends React.Component {
     super(props);
     this.game = new Game({
       fnStop: this.applyStopper,
-      fnUpdateField: this.updateField
+      fnUpdateField: this.updateField,
+      fnUpdateScore: this.applyScore
     });
     const field = this.game.field;
     this.state = {
       setter: null,
       isStarted: false,
       fieldArray: field,
-      game: null
+      game: null,
+      friends: null,
+      enemies: null
     };
   }
+  applyScore = ({ friends, enemies }) => {
+    this.setState({ friends, enemies });
+  };
   onClickSetter = type => {
     this.setState({ setter: type });
   };
@@ -63,6 +69,12 @@ class App extends React.Component {
           isStarted={this.state.isStarted}
           setter={this.state.setter}
         />
+        <div className="Score">
+          <div>Friends:</div>
+          <div>{this.state.friends}</div>
+          <div>Enemies:</div>
+          <div>{this.state.enemies}</div>
+        </div>
         <Field
           fieldArray={this.state.fieldArray}
           onClickSet={this.onClickSet}

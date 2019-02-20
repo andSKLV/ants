@@ -6,8 +6,10 @@ import { GetRandom, GetCell } from "./service.js";
 import { equal } from "assert";
 
 class Game {
-  constructor({ fnStop, fnUpdateField }) {
+  constructor({ fnStop, fnUpdateField, fnUpdateScore }) {
     this.ants = [];
+    this.enAntsNum = null;
+    this.frAntsNum = null;
     this.timerId = null;
     this.field = [];
     this.createField();
@@ -16,6 +18,8 @@ class Game {
     this.antsToDelete = [];
     this.fnStop = fnStop;
     this.fnUpdateField = fnUpdateField;
+    this.fnUpdateScore = fnUpdateScore;
+    fnUpdateScore(this.getScore());
   }
   createField() {
     const field = [];
@@ -155,6 +159,9 @@ class Game {
       return [f[y - 1][x], f[y + 1][x], f[y][x - 1], f[y][x + 1]];
     }
   };
+  /**
+   * Удаление муравьев путем вычитания массива antsToDelete из ants
+   */
   updateAntsArray = () => {
     this.ants = this.ants.filter(ant => !this.antsToDelete.includes(ant));
     this.antsToDelete = [];
@@ -203,14 +210,21 @@ class Game {
 
     //движения муравьев
     this.makeMove();
-    if (this.tikNum % 5 === 0) this.randomHoney();
+    if (this.tikNum % CONFIG.honeyFriquency === 0) this.randomHoney();
     // конец движения
 
     this.fnUpdateField(this.field); //setState new field
+    const score = this.getScore();
+    this.fnUpdateScore(score);
+
     this.tikNum++;
-    if (this.tikNum > CONFIG.maxMoves) this.stop();
+    if (this.isGameOver(score)) this.stop();
+
     console.timeEnd();
   };
+  /**
+   * Расчет движений всех муравьев
+   */
   makeMove = () => {
     const moves = this.ants.map(ant => {
       const direction = ant.makeMove();
@@ -226,12 +240,32 @@ class Game {
       }
     });
   };
+  isGameOver = score => {
+    if (this.tikNum > CONFIG.maxMoves) return true;
+    if (score.friends === 0 || score.enemies === 0) return true;
+    return false;
+  };
+  /**
+   * Останавливает игру
+   */
   stop = () => {
     clearInterval(this.timerId);
     this.fnStop();
     this.tikNum = 0;
     this.clg("equal");
   };
+  getScore = () => {
+    let enemies = 0;
+    let friends = 0;
+    this.ants.forEach(ant => {
+      ant.type === "friend" ? friends++ : enemies++;
+    });
+    return { friends, enemies };
+  };
+  /**
+   * Проверка, осталось ли одинаковое число друзей и врагов
+   * Должно быть true без генерации меда
+   */
   checkEquality() {
     const enemy = [];
     const friend = [];
