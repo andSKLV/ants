@@ -11,7 +11,7 @@ class Game {
     this.timerId = null;
     this.field = [];
     this.createField();
-    this.createRandomAnts(45);
+    this.createRandomAnts(20);
     this.tikNum = 0;
     this.antsToDelete = [];
     this.fnStop = fnStop;
@@ -213,10 +213,13 @@ class Game {
     this.clg("equal");
   };
   checkEquality() {
-    const flatted = this.field.flat();
-    const bool =
-      flatted.filter(x => x.type === "enemy").length ===
-      flatted.filter(x => x.type === "friend").length;
+    const enemy = [];
+    const friend = [];
+    this.field.flat().forEach(el => {
+      if (el.type === "enemy") enemy.push(el);
+      if (el.type === "friend") friend.push(el);
+    });
+    const bool = enemy.length === friend.length;
     console.log("Одинаковое количество в обоих командах = ", bool);
   }
   clg(type) {

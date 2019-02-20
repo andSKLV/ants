@@ -7,7 +7,7 @@ const getColor = type => {
     case "friend":
       return "blue";
     case "honey":
-      return "yellow";
+      return "orange";
     case "wall":
       return "black";
     case "empty":

@@ -1,7 +1,7 @@
 const CONFIG = {
-  maxRow: 10,
-  maxCol: 30,
-  maxMoves: 10,
+  maxRow: 20,
+  maxCol: 20,
+  maxMoves: 100,
   tikTime: 500
 };
 export default CONFIG;
