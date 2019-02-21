@@ -6,12 +6,16 @@ import { GetRandom } from "./service.js";
 class Game {
   constructor({ fnStop, fnUpdateField, fnUpdateScore }) {
     this.ants = [];
+    this.enemyCanBirth = CONFIG.initAntsNum;
+    this.enemyHome = [];
+    this.friendCanBirth = CONFIG.initAntsNum;
+    this.friendHome = [];
     this.enAntsNum = null;
     this.frAntsNum = null;
     this.timerId = null;
     this.field = [];
     this.createField();
-    this.createRandomAnts(CONFIG.initAntsNum);
+    // this.createRandomAnts(CONFIG.initAntsNum);
     this.tikNum = 0;
     this.antsToDelete = [];
     this.fnStop = fnStop;
@@ -51,6 +55,11 @@ class Game {
     if (type === "enemy" || type === "friend") {
       const ant = this.createAnt(x, y, type);
       return ant;
+    }
+    if (type === "enemyHome" || type === "friendHome") {
+      const home = new Cell(x, y, type);
+      this[type].push(home);
+      return home;
     }
     return new Cell(x, y, type);
   }
@@ -125,8 +134,8 @@ class Game {
   };
   eatHoney = (ant, newX, newY) => {
     this.moveAnt(ant, newX, newY);
-    const { x: randX, y: randY } = this.getRandomEmptyCell();
-    this.createAnt(randX, randY, ant.type);
+    const counterName = `${ant.type}CanBirth`;
+    this[counterName]++;
     return true;
   };
   destroyAnts = (ant1, ant2) => {
@@ -134,11 +143,50 @@ class Game {
     this.deleteAnt(ant2);
     return false;
   };
+  /**
+   * Запуск рождения муравьев на респе
+   */
+  birthAnts = () => {
+    const getBirth = type => {
+      let homeArr, counterName;
+      switch (type) {
+        case "enemy":
+          homeArr = this.enemyHome;
+          counterName = "enemyCanBirth";
+          break;
+        case "friend":
+          homeArr = this.friendHome;
+          counterName = "friendCanBirth";
+          break;
+        default:
+          return false;
+          break;
+      }
+      if (!this[counterName] || !homeArr.length) return false; // если нет муравьев в запасе или домов
+      const i = GetRandom(0, homeArr.length);
+      const home = homeArr[i];
+      const crest = this.getCrestArray(home.x, home.y).filter(
+        cell => cell.type === "empty"
+      );
+      if (!crest.length) return false; //если нет свободных клеток у дома
+      const cell = crest[0];
+      this.createAnt(cell.x, cell.y, type);
+      this[counterName]--;
+      return true;
+    };
+    let canBirth = true;
+    while (canBirth) {
+      canBirth = getBirth("enemy");
+    }
+    canBirth = true;
+    while (canBirth) {
+      canBirth = getBirth("friend");
+    }
+  };
   checkNeighbour = () => {
-    const f = this.field;
     this.ants.forEach(ant => {
       if (this.antsToDelete.includes(ant)) return false;
-      const neighArr = getNeighbourArray(ant);
+      const neighArr = this.getCrestArray(ant.x, ant.y);
       const searchType = ant.type === "enemy" ? "friend" : "enemy";
       for (let i = 0; i < neighArr.length; i++) {
         const neigh = neighArr[i];
@@ -152,10 +200,10 @@ class Game {
         }
       }
     });
-    function getNeighbourArray(ant) {
-      const { x, y } = ant;
-      return [f[y - 1][x], f[y + 1][x], f[y][x - 1], f[y][x + 1]];
-    }
+  };
+  getCrestArray = (x, y) => {
+    const f = this.field;
+    return [f[y - 1][x], f[y + 1][x], f[y][x - 1], f[y][x + 1]];
   };
   /**
    * Удаление муравьев путем вычитания массива antsToDelete из ants
@@ -182,10 +230,13 @@ class Game {
    * Создание на поле случайной ячейки меда
    */
   randomHoney = () => {
+    this.addCellRandomXY("honey");
+  };
+  addCellRandomXY = type => {
     const { x, y } = this.getRandomEmptyCell();
-    const honeyCell = this.createCell(x, y, "honey");
-    this.setCell(x, y, honeyCell);
-    return honeyCell;
+    const cell = this.createCell(x, y, type);
+    this.setCell(x, y, cell);
+    return cell;
   };
   /**
    * @param {Array} field - двумерный массив поля
@@ -202,6 +253,11 @@ class Game {
     if (this.antsToDelete.length) this.updateAntsArray();
     this.clg("ants");
 
+    //рождение муравьев
+    this.birthAnts();
+    //
+
+    //проверка на идентично количества муравьев на поле и в стеке
     const FIELD_LENGTH = this.field
       .flat()
       .filter(x => x.type === "enemy" || x.type === "friend").length; // TODO: потом далить

@@ -6,7 +6,9 @@ const ControlBar = props => {
   return (
     <div className="ControlBar">
       <Tag title="friend" onClickSetter={onClickSetter} setter={setter} />
+      <Tag title="friendHome" onClickSetter={onClickSetter} setter={setter} />
       <Tag title="enemy" onClickSetter={onClickSetter} setter={setter} />
+      <Tag title="enemyHome" onClickSetter={onClickSetter} setter={setter} />
       <Tag title="honey" onClickSetter={onClickSetter} setter={setter} />
       <Tag title="wall" onClickSetter={onClickSetter} setter={setter} />
       <button
