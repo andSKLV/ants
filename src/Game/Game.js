@@ -299,10 +299,12 @@ class Game {
     });
   };
   getVisibleZone ({x, y}) {
-    const minX = (x - 3 > 0) ? x - 3 : 0;
-    const maxX = x + 3;
-    const minY = (y - 3 > 0) ? y-3 : 0;
-    const maxY = y + 3;
+    debugger;
+    const delta = CONFIG.visibleRange;
+    const minX = (x - delta > 0) ? x - delta : 0;
+    const maxX = x + delta;
+    const minY = (y - delta > 0) ? y-delta : 0;
+    const maxY = y + delta;
     const visibleArray = [];
     for (let i = minY;i<=maxY;i++) {
       for (let j = minX;j<=maxX;j++) {
