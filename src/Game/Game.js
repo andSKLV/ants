@@ -284,6 +284,7 @@ class Game {
    */
   makeMove = () => {
     const moves = this.ants.map(ant => {
+      const visibleZone = this.getVisibleZone(ant);
       const direction = ant.makeMove();
       return { ant, direction };
     });
@@ -297,6 +298,22 @@ class Game {
       }
     });
   };
+  getVisibleZone ({x, y}) {
+    const minX = x - 3;
+    const maxX = x + 3;
+    const minY = y - 3;
+    const maxY = y + 3;
+    const visibleArray = [];
+    for (let i = minY;i<=maxY;i++) {
+      for (let j = minX;j<=maxX;j++) {
+        if (i===y && j===x) continue;
+        if (this.field[i]===undefined || this.field[i][j]) continue;
+        const cell = this.field[i][j];
+        visibleArray.push(cell);
+      }
+    }
+    return visibleArray;
+  }
   /**
    * @param {object} score - кол-во игроков в каждой команде
    * @returns {boolean} завершена ли игра
