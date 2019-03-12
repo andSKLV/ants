@@ -299,7 +299,6 @@ class Game {
     });
   };
   getVisibleZone ({x, y}) {
-    debugger;
     const delta = CONFIG.visibleRange;
     const minX = (x - delta > 0) ? x - delta : 0;
     const maxX = x + delta;

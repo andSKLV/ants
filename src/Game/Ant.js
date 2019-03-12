@@ -1,4 +1,11 @@
 import Cell from "./Cell.js";
+import { GetRandomElFromArray } from './service.js';
+
+const behaviors = {
+  normal: {
+    distanceDependencyPow : 2,
+  }
+}
 
 class Ant extends Cell {
   // constructor(x, y, type) {
@@ -22,14 +29,21 @@ class Ant extends Cell {
   }
   makeMove(visibleArr) {
     if (this.type==='enemy') return this.getRandomMove(); //FIXME: пока что для одной команды рандом
+
+    const behavior = behaviors.normal;
+    const {distanceDependencyPow} = behavior;
+
     const directions = {
-      x: 0,
-      y: 0,
+      '+x': 0,
+      '-x': 0,
+      '+y': 0,
+      '-y': 0,
     }
-    const enviroment = visibleArr.filter(cell => cell.type !== 'empty' && cell.type !== 'wall');
+    const enviroment = visibleArr.filter(cell => cell.type !== 'empty');
     enviroment.forEach(cell=>{
       const distance = this.getDistance(cell);
-      const {dx,dy} = this.getBasis(cell);
+      const deltas = this.getBasis(cell);
+      const {dx,dy} = deltas;
       if (distance===undefined || dx === undefined || dy === undefined) {
         throw new Error ('Distance calculating error',distance,dx,dy,this,cell);
       }
@@ -40,33 +54,61 @@ class Ant extends Cell {
           if (this.isOpposite(cell)) {
             factor = 0.75;
           } else {
-            factor = -0.1;
+            factor = 0.1;
           }
           break;
         case 'honey':
           factor = 1;
           break;
         case 'wall':
-          factor = -1;
+          factor = -99;
           break;
         case 'friendHome':
         case 'enemyHome':
           if (this.isOpposite(cell)) {
             factor = 1;
           } else {
-            factor = -1;
+            factor = -0.8;
           }
           break;
         default:
           break;
       }
-      factor = factor * 1/distance;
-      directions.x = directions.x + factor*(dx/distance);
-      directions.y = directions.y + factor*(dy/distance);
+      applyFactorXY(deltas, factor, distance);
     })
-    const scale = (Math.abs(directions.x) > Math.abs(directions.y)) ? 'x' : 'y';
-    const sign = Math.sign(directions[scale]);
-    return `${sign}${scale}`;
+
+    return  getMaxFactor(directions);
+
+    function applyFactorXY(deltas, factor, distance) {
+      ['x', 'y'].forEach(scale => {
+        applyFactor(scale, deltas, factor, distance);
+      })
+    }
+
+    function applyFactor(scale, deltas, factor, distance) {
+      const deltaName = `d${scale}`;
+      const delta = deltas[deltaName];
+      const directionName = delta > 0 ? `+${scale}` : `-${scale}`;
+      const factorWithDistance = (Number.isInteger(factor)) ? (factor/distance) * (Math.abs(delta) / distance)**distanceDependencyPow : -Infinity;
+      directions[directionName] += factorWithDistance;
+    }
+
+    function getMaxFactor(directions) {
+      let maxDirection = [];
+      let maxValue = - Infinity;
+      for (let key in directions) {
+        const val = directions[key];
+        if (val === maxValue) {
+          maxDirection.push(key);
+        }
+        if (val > maxValue) {
+          maxValue = val;
+          maxDirection = [key];
+        }
+
+      }
+      return GetRandomElFromArray(maxDirection);
+    }
   }
   addMove(conditions){
 
