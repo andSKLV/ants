@@ -19,7 +19,7 @@ class Ant extends Cell {
     const {x : x1,y : y1} = this;
     const {x : x2,y : y2} = cell;
     const dx = x2 - x1;
-    const dy = -(y2 - y1); //перевернутая шкала, так как -y это вверх в отличии от нормальной шкалы
+    const dy = y2 - y1; //перевернутая шкала, так как -y это вверх в отличии от нормальной шкалы
     return {dx,dy};
   }
   getDistance(cell) {
@@ -61,7 +61,7 @@ class Ant extends Cell {
           factor = 1;
           break;
         case 'wall':
-          factor = -99;
+          factor = distance === 1 ? -1 : 0;
           break;
         case 'friendHome':
         case 'enemyHome':
